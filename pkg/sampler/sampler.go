@@ -6,6 +6,8 @@ import (
 	"net"
 	"net/http"
 	"time"
+	"crypto/tls"
+	"crypto/x509"
 )
 
 type Target struct {
@@ -50,8 +52,36 @@ type Sampler struct {
 
 // New initializes a sane sampler.
 func New() Sampler {
+
+	certs := x509.NewCertPool()
+	pemPath := "/home/gblmarquez/Downloads/CERTIFICADO_18792479000101.pem"
+
+	fmt.Fprintf(os.Stderr, "read cert %s\n", pemPath)
+
+	pemData, err := ioutil.ReadFile(pemPath)
+	if err != nil {
+			// do error
+	}
+	certs.AppendCertsFromPEM(pemData)
+
+	mTLSConfig := &tls.Config {
+		RootCAs: roots,
+		CipherSuites: []uint16 {
+			tls.TLS_RSA_WITH_RC4_128_SHA,
+			tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA,
+			tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+		}
+	}
+
+	mTLSConfig.PreferServerCipherSuites = true
+	mTLSConfig.MinVersion = tls.VersionTLS10
+
 	return Sampler{
-		tr: http.Transport{
+		tr: http.Transport {
+			TLSClientConfig: mTLSConfig,
 			DisableKeepAlives: true,
 			Dial: func(netw, addr string) (net.Conn, error) {
 				c, err := net.DialTimeout(netw, addr, 10*time.Second)
@@ -68,7 +98,12 @@ func New() Sampler {
 
 // Sample measures a given target and returns both a Sample and error details.
 func (s Sampler) Sample(target Target) (sample Sample, err error) {
-	req, err := http.NewRequest("GET", target.URL, nil)
+
+	client := &http.Client {
+		Transport: s.tr
+	}
+
+	req, err := client.Get(target.URL) //http.NewRequest("GET", target.URL, nil)
 	if err != nil {
 		return sample, err
 	}
