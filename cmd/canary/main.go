@@ -6,10 +6,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/canaryio/canary"
-	"github.com/canaryio/canary/pkg/sampler"
-	"github.com/canaryio/canary/pkg/manifest"
-	"github.com/canaryio/canary/pkg/stdoutpublisher"
+	"github.com/gblmarquez/canary"
+	"github.com/gblmarquez/canary/pkg/sampler"
+	"github.com/gblmarquez/canary/pkg/manifest"
+	"github.com/gblmarquez/canary/pkg/stdoutpublisher"
 )
 
 // usage prints a useful usage message.

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/canaryio/canary/pkg/sampler"
+	"github.com/gblmarquez/canary/pkg/sampler"
 )
 
 // Manifest represents configuration data.
@@ -31,7 +31,7 @@ func (m *Manifest) GenerateRampupDelays(intervalSeconds int) {
 // GetManifest retreives a manifest from a given URL.
 func GetManifest(url string, defaultInterval int) (manifest Manifest, err error) {
 	var stream io.ReadCloser
-	
+
 	if url[:7] == "file://" {
 		stream, err = os.Open(url[7:])
 	} else {
@@ -40,7 +40,7 @@ func GetManifest(url string, defaultInterval int) (manifest Manifest, err error)
 		if err != nil {
 			return
 		}
-		
+
 		stream = resp.Body
 	}
 
